@@ -1,0 +1,8 @@
+The content is in the below block.
+
+###
+{{$input}}
+###
+
+Ignore all of the HTML markup and focus on the actual contant.
+Summarize the actual content.
