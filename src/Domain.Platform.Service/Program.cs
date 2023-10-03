@@ -86,7 +86,7 @@ static void RegisterServices(IServiceCollection s)
 			{
 				logger.LogInformation("Importing native skills");
 				kernel.ImportSkill(new Microsoft.SemanticKernel.Skills.Core.TextSkill());
-				kernel.ImportSkill(new DownloadContent(s.GetRequiredService<IHttpClientFactory>()), "MySkills");
+				kernel.ImportSkill(new DownloadContent(s.GetRequiredService<IHttpClientFactory>(), s.GetRequiredService<ILogger<DownloadContent>>()), "MySkills");
 			}
 		});
 }

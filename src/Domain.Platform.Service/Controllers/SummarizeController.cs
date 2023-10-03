@@ -11,11 +11,14 @@ namespace Domain.Platform.Service.Controllers
 	public class SummarizeController : ControllerBase
 	{
 		private readonly IOrchestrator orchestrator;
+		private readonly ILogger<SummarizeController> logger;
 
 		public SummarizeController(
-			IOrchestrator orchestrator)
+			IOrchestrator orchestrator,
+			ILogger<SummarizeController> logger)
 		{
 			this.orchestrator = orchestrator;
+			this.logger = logger;
 		}
 
 		[HttpGet(Name = nameof(Website))]
@@ -27,6 +30,7 @@ namespace Domain.Platform.Service.Controllers
 		public async Task<ActionResult<string>> Website(string websiteUrl)
 		{
 			var response = await this.orchestrator.Invoke(websiteUrl);
+			this.logger.LogDebug(response);
 			return Ok(response);
 		}
 	}

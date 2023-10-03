@@ -7,10 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="ai-plugin.json" />
     <Content Remove="GenerativeAi\SemanticSkills\Domain\summarizehtml\config.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="ai-plugin.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="GenerativeAi\SemanticSkills\Domain\summarizehtml\config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

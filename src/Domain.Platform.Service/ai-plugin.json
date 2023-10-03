@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "v1",
+  "nameForModel": "Domain-Partner-Plugin",
+  "nameForHuman": "Domain partner plugin",
+  "descriptionForModel": "Use this to get summaries from text and websites.",
+  "descriptionForHuman": "This plugin contains actions to create summaries for text and websites.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "{url}/swagger/v1/swagger.json"
+  },
+  "logoUrl": "{url}/logo.png",
+  "contactEmail": "jan@jan-v.nl",
+  "legalInfoUrl": "http://www.example.com/legal"
+}

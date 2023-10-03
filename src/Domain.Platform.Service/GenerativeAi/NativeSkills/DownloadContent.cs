@@ -1,5 +1,4 @@
-﻿using Microsoft.SemanticKernel.Orchestration;
-using Microsoft.SemanticKernel.SkillDefinition;
+﻿using Microsoft.SemanticKernel.SkillDefinition;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 
@@ -10,19 +9,21 @@ namespace Domain.Platform.Service.GenerativeAi.NativeSkills
 	/// </summary>
 	internal class DownloadContent
 	{
-		private const string WebsiteUrlParameterValue = "websiteUrl";
 		private readonly IHttpClientFactory httpClientFactory;
+		private readonly ILogger logger;
 
-		public DownloadContent(IHttpClientFactory httpClientFactory)
+		public DownloadContent(
+			IHttpClientFactory httpClientFactory,
+			ILogger logger)
 		{
 			this.httpClientFactory = httpClientFactory;
+			this.logger = logger;
 		}
 
 		[SKFunction, Description("Retrieve the body from a specified website URL.")]
-		[SKParameter(WebsiteUrlParameterValue, "Retrieves the content of the body from an HTML page.")]
-		public async Task<string> GetBody(SKContext context)
+		public async Task<string> GetBody(string websiteUrl)
 		{
-			var websiteUrl = context.Variables[WebsiteUrlParameterValue];
+			logger.LogDebug("Retrieving the content for `{websiteUrl}`.", websiteUrl);
 			var content = await GetContent(websiteUrl);
 
 			return content;
