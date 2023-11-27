@@ -63,7 +63,7 @@ static void RegisterServices(IServiceCollection s)
 							openAiSettings.ServiceCompletionEndpoint,
 							openAiSettings.ServiceKey
 				)
-				.WithAzureTextEmbeddingGenerationService(
+				.WithAzureOpenAITextEmbeddingGenerationService(
 							openAiSettings.EmbeddingsDeploymentId,
 							openAiSettings.ServiceCompletionEndpoint,
 							openAiSettings.ServiceKey
@@ -79,14 +79,14 @@ static void RegisterServices(IServiceCollection s)
 			{
 				logger.LogInformation("Importing semantic skills");
 				string skillsPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "GenerativeAi", "SemanticSkills");
-				kernel.ImportSemanticSkillFromDirectory(skillsPath, "Domain");
+				kernel.ImportSemanticFunctionsFromDirectory(skillsPath, "Domain");
 			}
 
 			void AddNativeSkills()
 			{
 				logger.LogInformation("Importing native skills");
-				kernel.ImportSkill(new Microsoft.SemanticKernel.Skills.Core.TextSkill());
-				kernel.ImportSkill(new DownloadContent(s.GetRequiredService<IHttpClientFactory>(), s.GetRequiredService<ILogger<DownloadContent>>()), "MySkills");
+				kernel.ImportFunctions(new Microsoft.SemanticKernel.Plugins.Core.TextPlugin());
+				kernel.ImportFunctions(new DownloadContent(s.GetRequiredService<IHttpClientFactory>(), s.GetRequiredService<ILogger<DownloadContent>>()), "MySkills");
 			}
 		});
 }

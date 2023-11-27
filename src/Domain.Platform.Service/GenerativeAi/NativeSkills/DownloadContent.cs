@@ -1,4 +1,4 @@
-﻿using Microsoft.SemanticKernel.SkillDefinition;
+﻿using Microsoft.SemanticKernel;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 

@@ -1,8 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.Functions.OpenAPI.OpenAI;
+using Microsoft.SemanticKernel.Planners;
 using Microsoft.SemanticKernel.Planning;
-using Microsoft.SemanticKernel.Planning.Sequential;
-using Microsoft.SemanticKernel.Skills.OpenAPI.Extensions;
 
 namespace Partner.Copilot.Service.GenerativeAi
 {
@@ -27,36 +26,40 @@ namespace Partner.Copilot.Service.GenerativeAi
 			var plan = await CreatePlan(request);
 			this.logger.LogDebug(plan.ToJson());
 
-			var executedPlan = await ExecutePlanAsync(plan);
+			var functionResult = await plan.InvokeAsync(this.kernel);
 
-			if (executedPlan.Variables.TryGetValue("stepCount", out string? stepCount))
+			if (functionResult.TryGetMetadataValue("stepCount", out string stepCount))
 			{
 				this.logger.LogDebug("Steps Taken: " + stepCount);
 			}
-			if (executedPlan.Variables.TryGetValue("skillCount", out string? skillCount))
+			if (functionResult.TryGetMetadataValue("functionCount", out string functionCount))
 			{
-				this.logger.LogDebug("Skills Used: " + skillCount);
+				this.logger.LogDebug("Functions Used: " + functionCount);
+			}
+			if (functionResult.TryGetMetadataValue("iterations", out string iterations))
+			{
+				this.logger.LogDebug("Iterations: " + iterations);
 			}
 
-			return executedPlan.ToString();
+			return functionResult.GetValue<string>()!;
 		}
 
 		private async Task AddOpenAiPlugins()
 		{
 			const string pluginManifestUrl = "https://localhost:7044/.well-known/ai-plugin.json";
-			await kernel.ImportAIPluginAsync("DomainSkill", new Uri(pluginManifestUrl));
+			await kernel.ImportOpenAIPluginFunctionsAsync("DomainSkill", new Uri(pluginManifestUrl));
 		}
 
 		private async Task<Plan> CreatePlan(string request, bool useStepwisePlanner = true)
 		{
 			if (useStepwisePlanner)
 			{
-				Microsoft.SemanticKernel.Planning.Stepwise.StepwisePlannerConfig config = new()
+				StepwisePlannerConfig config = new()
 				{
 					MaxTokens = 2000,
 					MaxIterations = 2,
 				};
-				config.ExcludedSkills.Add("_GLOBAL_FUNCTIONS_");
+				config.ExcludedFunctions.Add("_GLOBAL_FUNCTIONS_");
 
 				var planner = new StepwisePlanner(kernel, config);
 				var plan = planner.CreatePlan(request);
@@ -65,9 +68,9 @@ namespace Partner.Copilot.Service.GenerativeAi
 			else
 			{
 				var configuration = new SequentialPlannerConfig();
-				configuration.ExcludedFunctions.Add("WriteAsync");
-				configuration.ExcludedFunctions.Add("ReadAsync");
-				configuration.ExcludedSkills.Add("_GLOBAL_FUNCTIONS_");
+				configuration.ExcludedFunctions.Add("Write");
+				configuration.ExcludedFunctions.Add("Read");
+				configuration.ExcludedFunctions.Add("_GLOBAL_FUNCTIONS_");
 				var planner = new SequentialPlanner(kernel, configuration);
 
 				var plan = await planner.CreatePlanAsync(request);
@@ -75,16 +78,6 @@ namespace Partner.Copilot.Service.GenerativeAi
 
 				return plan;
 			}			
-		}
-
-		private async Task<SKContext> ExecutePlanAsync(
-			Plan plan)
-		{
-			Microsoft.SemanticKernel.AI.TextCompletion.CompleteRequestSettings settings = new()
-			{
-				MaxTokens = 2000,
-			};
-			return await plan.InvokeAsync(kernel.CreateNewContext(), settings: settings);
 		}
 	}
 

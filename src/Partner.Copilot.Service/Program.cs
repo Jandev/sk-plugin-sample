@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Skills.OpenAPI.Extensions;
 using Partner.Copilot.Service;
 using Partner.Copilot.Service.GenerativeAi;
 using System.Reflection;
@@ -63,7 +62,7 @@ static void RegisterServices(IServiceCollection s)
 							openAiSettings.ServiceCompletionEndpoint,
 							openAiSettings.ServiceKey
 				)
-				.WithAzureTextEmbeddingGenerationService(
+				.WithAzureOpenAITextEmbeddingGenerationService(
 							openAiSettings.EmbeddingsDeploymentId,
 							openAiSettings.ServiceCompletionEndpoint,
 							openAiSettings.ServiceKey
@@ -85,7 +84,7 @@ static void RegisterServices(IServiceCollection s)
 			void AddNativeSkills()
 			{
 				logger.LogInformation("Importing native skills");
-				kernel.ImportSkill(new Microsoft.SemanticKernel.Skills.Core.TextSkill());
+				kernel.ImportFunctions(new Microsoft.SemanticKernel.Plugins.Core.TextPlugin());
 			}
 
 			void AddOpenAiPlugins()
