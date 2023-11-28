@@ -1,6 +1,5 @@
 ﻿using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Planners;
-using Microsoft.SemanticKernel.Planning;
+using Microsoft.SemanticKernel.Planners.Handlebars;
 
 namespace Domain.Platform.Service.GenerativeAi
 {
@@ -20,27 +19,18 @@ namespace Domain.Platform.Service.GenerativeAi
 		/// <inheritdoc />
 		public async Task<string> Invoke(string request)
 		{
-			var plan = await CreatePlan(request);
-
-			logger.LogDebug(plan.ToJson());
-
-			var executedPlan = await kernel.RunAsync(plan);
-			return executedPlan.GetValue<string>() ?? string.Empty;
-		}
-
-		private async Task<Plan> CreatePlan(string request)
-		{
-			var configuration = new SequentialPlannerConfig();
+			var configuration = new HandlebarsPlannerConfig();
 			ExcludeFunctions(configuration);
-			var planner = new SequentialPlanner(kernel, configuration);
+			var planner = new HandlebarsPlanner(kernel, configuration);
 
 			var plan = await planner.CreatePlanAsync(request);
-			this.logger.LogInformation("Original plan: {plan}", plan.ToJson());
+			this.logger.LogInformation("Original plan: {plan}", plan);
 
-			return plan;
+			var result = plan.Invoke(kernel.CreateNewContext(), new Dictionary<string, object?>(), CancellationToken.None);
+			return result.GetValue<string>();
 		}
 
-		private static void ExcludeFunctions(SequentialPlannerConfig configuration)
+		private static void ExcludeFunctions(HandlebarsPlannerConfig configuration)
 		{
 			// Remove the functions to read/write files, located in the `_GLOBAL_SKILLS_`.
 			// These got added randomly whenever the LLM figured a file needs to be created or read.

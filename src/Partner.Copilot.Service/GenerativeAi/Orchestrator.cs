@@ -23,7 +23,7 @@ namespace Partner.Copilot.Service.GenerativeAi
 		{
 			await AddOpenAiPlugins();
 
-			var plan = await CreatePlan(request);
+			var plan = await CreatePlan(request, false);
 			this.logger.LogDebug(plan.ToJson());
 
 			var functionResult = await plan.InvokeAsync(this.kernel);

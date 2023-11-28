@@ -59,14 +59,18 @@ static void RegisterServices(IServiceCollection s)
 
 			var kernel = new KernelBuilder()
 				.WithAzureTextCompletionService(
-							openAiSettings.ServiceModelName,
-							openAiSettings.ServiceCompletionEndpoint,
-							openAiSettings.ServiceKey
+					openAiSettings.ServiceModelName,
+					openAiSettings.ServiceCompletionEndpoint,
+					openAiSettings.ServiceKey
 				)
+				.WithAzureOpenAIChatCompletionService(
+					openAiSettings.ServiceModelName,
+					openAiSettings.ServiceCompletionEndpoint,
+					openAiSettings.ServiceKey)
 				.WithAzureOpenAITextEmbeddingGenerationService(
-							openAiSettings.EmbeddingsDeploymentId,
-							openAiSettings.ServiceCompletionEndpoint,
-							openAiSettings.ServiceKey
+					openAiSettings.EmbeddingsDeploymentId,
+					openAiSettings.ServiceCompletionEndpoint,
+					openAiSettings.ServiceKey
 				)
 			.Build();
 
